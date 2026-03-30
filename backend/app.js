@@ -23,6 +23,7 @@ const quizRoutes = require('./routes/quiz.routes');
 const courseFeedbackRoutes = require('./routes/courseFeedback.routes');
 
 const app = express();
+app.set('trust proxy', 1);
 
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
