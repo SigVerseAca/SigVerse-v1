@@ -6,6 +6,8 @@ const LearningEvent = require('../models/mongo/LearningEvent');
 const EmailOtp = require('../models/mongo/EmailOtp');
 const ApprovalRequest = require('../models/mongo/ApprovalRequest');
 
+// UserService provides business logic for user-related operations, acting as an intermediary between the UserRepository (data access layer) and the controllers (presentation layer). 
+// It includes methods for retrieving all users, getting a user by ID, creating a new user, updating an existing user, partially updating a user, and deleting a user. The delete method also handles cleanup of related data in MongoDB before removing the user from MySQL.
 class UserService {
   static getAll() { return UserRepository.findAll(); }
   static getById(id) { return UserRepository.findById(id); }

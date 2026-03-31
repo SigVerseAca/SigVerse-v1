@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// ApprovalRequest model for MongoDB database
 const approvalRequestSchema = new mongoose.Schema({
   requester_id: { type: Number, default: null },
   reviewer_id: { type: Number, default: null },

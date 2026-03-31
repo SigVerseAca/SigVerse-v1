@@ -1,6 +1,8 @@
 const UserService = require('../services/UserService');
 const { sendSuccess, sendError } = require('../utils/response');
 
+
+// Retrieves all users, filtering out self from results
 exports.getAll = async (req, res, next) => {
   try {
     const data = await UserService.getAll();
@@ -11,6 +13,7 @@ exports.getAll = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// Fetches a single user record by their ID
 exports.getById = async (req, res, next) => {
   try {
     const data = await UserService.getById(req.params.id);
@@ -19,6 +22,7 @@ exports.getById = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// Updates user information with full validation
 exports.update = async (req, res, next) => {
   try {
     if (req.user.role === 'admin' && Number(req.params.id) === req.user.sub) {
@@ -29,6 +33,7 @@ exports.update = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// Partially updates user fields with change validation
 exports.patch = async (req, res, next) => {
   try {
     if (req.user.role === 'admin' && Number(req.params.id) === req.user.sub) {
@@ -39,6 +44,7 @@ exports.patch = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// Deletes a user account with role validation
 exports.remove = async (req, res, next) => {
   try {
     if (req.user.role === 'admin' && Number(req.params.id) === req.user.sub) {

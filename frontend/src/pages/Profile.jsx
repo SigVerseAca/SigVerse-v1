@@ -4,6 +4,7 @@ import useToast from '../hooks/useToast';
 import { usePageTitle } from '../hooks/usePageTitle';
 import api from '../services/api';
 
+// Profile page for displaying and editing user profile information
 export default function Profile() {
   const { user, setUser } = useAuth();
   const { showToast } = useToast();
@@ -14,6 +15,7 @@ export default function Profile() {
 
   usePageTitle('Profile');
 
+  // Handles profile save operation with API call and toast notifications
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -26,6 +28,7 @@ export default function Profile() {
     } finally { setSaving(false); }
   };
 
+  // Renders the profile page with user information and edit form
   return (
     <div className="page-container">
       <div className="page-header">
