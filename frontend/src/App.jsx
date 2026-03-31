@@ -35,7 +35,7 @@ function RootRedirect() {
   if (user) return <Navigate to="/dashboard" />;
   return <Navigate to="/login" />;
 }
-
+ // AppRoutes component handles all routing for the application
 function AppRoutes() {
   const location = useLocation();
   const hideBackOn = ['/login', '/auth/callback'];
