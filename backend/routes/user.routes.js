@@ -6,6 +6,8 @@ const validate = require('../middlewares/validate');
 const logger = require('../middlewares/logger');
 const { userUpdateSchema, userPatchSchema } = require('../utils/validators/userValidator');
 
+
+// User routes for managing user accounts
 router.get('/', authenticate, authorize('admin', 'instructor'), logger, UserController.getAll);
 router.get('/:id', authenticate, logger, UserController.getById);
 router.put('/:id', authenticate, authorize('admin'), validate(userUpdateSchema), logger, UserController.update);
