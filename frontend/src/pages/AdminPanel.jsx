@@ -23,6 +23,7 @@ export default function AdminPanel() {
 
   usePageTitle('Admin Panel');
 
+  // Tab configuration for admin panel sections
   const tabs = [
     { key: 'users', label: 'Users', icon: 'user' },
     { key: 'courses', label: 'Courses', icon: 'courses' },
@@ -30,6 +31,7 @@ export default function AdminPanel() {
     { key: 'approvals', label: 'Approvals', icon: 'shield' }
   ];
 
+  // Fetches data based on active tab, handles approvals filtering
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -48,11 +50,13 @@ export default function AdminPanel() {
   useEffect(() => { fetchData(); }, [tab]);
   useEffect(() => { setCurrentPage(1); }, [tab, searchValue]);
 
+  // Filters data based on search input across all fields
   const filteredData = data.filter((item) => {
     const haystack = Object.values(item || {}).join(' ').toLowerCase();
     return haystack.includes(searchValue.trim().toLowerCase());
   });
 
+  // Calculates pagination data for current page display
   const totalPages = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
   const paginatedData = filteredData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
@@ -60,6 +64,7 @@ export default function AdminPanel() {
     if (currentPage > totalPages) setCurrentPage(totalPages);
   }, [currentPage, totalPages]);
 
+  // Deletes selected item and refreshes data
   const handleDelete = async () => {
     if (confirmTarget === null) return;
     try {
@@ -73,6 +78,7 @@ export default function AdminPanel() {
     }
   };
 
+  // Saves or updates item with form submission handling
   const handleSaveEdit = async (event) => {
     event.preventDefault();
     const formData = Object.fromEntries(new FormData(event.target));
@@ -93,6 +99,7 @@ export default function AdminPanel() {
     } catch (err) { showToast(err.response?.data?.message || 'Save failed', 'error'); }
   };
 
+  // Approves or rejects request with status update
   const handleApproval = async (requestId, action) => {
     if (approvalActionId === requestId) return;
 
@@ -113,6 +120,7 @@ export default function AdminPanel() {
     }
   };
 
+  // Formats approval request title from action and type
   const getApprovalTitle = (request) => {
     const actionLabel = {
       create: 'Create',
@@ -130,6 +138,7 @@ export default function AdminPanel() {
     return `${actionLabel} ${typeLabel}`;
   };
 
+  // Generates approval request summary based on type
   const getApprovalSummary = (request) => {
     if (request.request_type === 'instructor_signup') {
       const name = request.payload?.name || 'New instructor';
@@ -152,6 +161,7 @@ export default function AdminPanel() {
     return 'Approval request pending review';
   };
 
+  // Formats approval metadata including requester and timestamp
   const getApprovalMeta = (request) => {
     const createdAt = request.created_at ? new Date(request.created_at).toLocaleString() : '';
     const requester = request.requester_id ? `Requester #${request.requester_id}` : 'Pending local signup';
@@ -159,6 +169,7 @@ export default function AdminPanel() {
     return `${requester} • ${entity}${createdAt ? ` • ${createdAt}` : ''}`;
   };
 
+  // Returns table columns based on active tab
   const getColumns = () => {
     switch (tab) {
       case 'users': return ['id', 'name', 'email', 'role'];
@@ -168,6 +179,7 @@ export default function AdminPanel() {
     }
   };
 
+  // Returns form fields configuration based on tab
   const getFormFields = () => {
     switch (tab) {
       case 'users': return [
@@ -189,6 +201,7 @@ export default function AdminPanel() {
     }
   };
 
+  // Renders the admin panel with tabs, data table, and modals for editing and confirming actions
   return (
     <div className="page-container">
       <div className="page-header">
