@@ -1,5 +1,6 @@
 const User = require('../models/mysql/User');
 
+// UserRepository provides an abstraction layer for user data access and manipulation using the User model for MySQL database operations. 
 class UserRepository {
   static findAll() { return User.findAll(); }
   static findById(id) { return User.findById(id); }
