@@ -10,6 +10,80 @@ import { approveRequest, getApprovals, rejectRequest } from '../services/approva
 
 const PAGE_SIZE = 8;
 
+function PayloadRow({ label, value }) {
+  if (!value && value !== 0) return null;
+  return (
+    <div className="payload-row">
+      <span className="payload-label">{label}</span>
+      <span className="payload-value">{String(value)}</span>
+    </div>
+  );
+}
+
+function ApprovalPayload({ request }) {
+  const p = request.payload || {};
+  const type = request.request_type;
+
+  if (type === 'instructor_signup') {
+    return (
+      <div className="approval-payload-pretty">
+        <p className="payload-section-title">Instructor Details</p>
+        <PayloadRow label="Full name"     value={p.name} />
+        <PayloadRow label="Email"         value={p.email} />
+        <PayloadRow label="Role"          value={p.role} />
+        <PayloadRow label="Account ID"    value={p.user_id} />
+        <PayloadRow label="Signup method" value={p.provider || 'email'} />
+      </div>
+    );
+  }
+
+  if (type === 'course') {
+    return (
+      <div className="approval-payload-pretty">
+        <p className="payload-section-title">Course Details</p>
+        <PayloadRow label="Title"         value={p.title} />
+        <PayloadRow label="Description"   value={p.description} />
+        <PayloadRow label="Instructor ID" value={p.instructor_id} />
+        <PayloadRow label="Video URL"     value={p.youtube_video_url} />
+      </div>
+    );
+  }
+
+  if (type === 'module') {
+    return (
+      <div className="approval-payload-pretty">
+        <p className="payload-section-title">Module Details</p>
+        <PayloadRow label="Module name"    value={p.module_name} />
+        <PayloadRow label="Course ID"      value={p.course_id} />
+        <PayloadRow label="Sequence order" value={p.sequence_order} />
+      </div>
+    );
+  }
+
+  if (type === 'lesson') {
+    return (
+      <div className="approval-payload-pretty">
+        <p className="payload-section-title">Lesson Details</p>
+        <PayloadRow label="Lesson name" value={p.lesson_name} />
+        <PayloadRow label="Module ID"   value={p.module_id} />
+        <PayloadRow label="Video URL"   value={p.youtube_video_url} />
+        <PayloadRow label="Content"     value={p.content ? p.content.slice(0, 120) + (p.content.length > 120 ? '…' : '') : null} />
+      </div>
+    );
+  }
+
+  const entries = Object.entries(p).filter(([, v]) => v !== null && v !== undefined && v !== '');
+  if (entries.length === 0) return null;
+  return (
+    <div className="approval-payload-pretty">
+      <p className="payload-section-title">Request Details</p>
+      {entries.map(([k, v]) => (
+        <PayloadRow key={k} label={k.replace(/_/g, ' ')} value={typeof v === 'object' ? JSON.stringify(v) : v} />
+      ))}
+    </div>
+  );
+}
+
 export default function AdminPanel() {
   const { showToast } = useToast();
   const [tab, setTab] = useState('users');
@@ -249,7 +323,8 @@ export default function AdminPanel() {
                   {request.note && request.status === 'rejected' && (
                     <p className="approval-note">Admin note: {request.note}</p>
                   )}
-                  <pre className="approval-payload">{JSON.stringify(request.payload || {}, null, 2)}</pre>
+                  {/* <pre className="approval-payload">{JSON.stringify(request.payload || {}, null, 2)}</pre> */}
+                  <ApprovalPayload request={request} />
                   {request.status === 'pending' && (
                     <div className="approval-actions">
                       <button

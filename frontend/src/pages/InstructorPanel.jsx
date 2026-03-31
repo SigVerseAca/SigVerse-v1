@@ -40,6 +40,10 @@ export default function InstructorPanel() {
   const [quizModal, setQuizModal] = useState(null);
   const [quizDraft, setQuizDraft] = useState(null);
   const [confirmTarget, setConfirmTarget] = useState(null);
+  const [collapsedCourses, setCollapsedCourses] = useState({});
+  const [collapsedModules, setCollapsedModules] = useState({});
+  const toggleCourse = (id) => setCollapsedCourses((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleModule = (id) => setCollapsedModules((prev) => ({ ...prev, [id]: !prev[id] }));
 
   usePageTitle('Instructor Panel');
 
@@ -538,47 +542,73 @@ export default function InstructorPanel() {
               <div className="instructor-actions">
                 <button className="btn btn-ghost btn-xs" onClick={() => setEditModal(course)}>Edit</button>
                 <button className="btn btn-danger btn-xs" onClick={() => setConfirmTarget({ type: 'courses', id: course.id })}>Delete</button>
+                <button
+                  className={`collapse-btn ${collapsedCourses[course.id] ? '' : 'open'}`}
+                  onClick={() => toggleCourse(course.id)}
+                  title={collapsedCourses[course.id] ? 'Expand course' : 'Collapse course'}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 6l4 4 4-4"/>
+                  </svg>
+                </button>
               </div>
             </div>
-            <button className="btn btn-ghost btn-xs" onClick={() => setModuleModal({ courseId: course.id })}>Add Module</button>
+            {!collapsedCourses[course.id] && (
+              <div className="instructor-course-body">
+                <button className="btn btn-ghost btn-xs" onClick={() => setModuleModal({ courseId: course.id })}>Add Module</button>
 
-            <div className="module-admin-list">
-              {course.modules?.map((moduleItem) => (
-                <div key={moduleItem.id} className="module-admin-card">
-                  <div className="module-admin-head">
-                    <div>
-                      <h4>{moduleItem.module_name}</h4>
-                      <span>Sequence {moduleItem.sequence_order}</span>
-                    </div>
-                    <div className="instructor-actions">
-                      <button className="btn btn-ghost btn-xs" onClick={() => setModuleModal({ ...moduleItem, courseId: course.id })}>Edit</button>
-                      <button className="btn btn-danger btn-xs" onClick={() => setConfirmTarget({ type: 'modules', id: moduleItem.id })}>Delete</button>
-                    </div>
-                  </div>
-                  <div className="module-admin-actions">
-                    <button className="btn btn-ghost btn-xs" onClick={() => setLessonModal({ moduleId: moduleItem.id })}>Add Lesson</button>
-                    <button className="btn btn-ghost btn-xs" onClick={() => openQuizModal(moduleItem)}>
-                      {moduleQuizzes[moduleItem.id] ? 'Edit Quiz' : 'Add Quiz'}
-                    </button>
-                    {moduleQuizzes[moduleItem.id] && <span className="quiz-badge">Quiz ready</span>}
-                  </div>
-                  <div className="lesson-admin-list">
-                    {moduleItem.lessons?.map((lesson) => (
-                      <div key={lesson.id} className="lesson-admin-card">
+                <div className="module-admin-list">
+                  {course.modules?.map((moduleItem) => (
+                    <div key={moduleItem.id} className="module-admin-card">
+                      <div className="module-admin-head">
                         <div>
-                          <strong>{lesson.lesson_name}</strong>
-                          <p>{lesson.content?.slice(0, 160) || 'No lesson content yet.'}</p>
+                          <h4>{moduleItem.module_name}</h4>
+                          <span>Sequence {moduleItem.sequence_order}</span>
                         </div>
                         <div className="instructor-actions">
-                          <button className="btn btn-ghost btn-xs" onClick={() => setLessonModal({ ...lesson, moduleId: moduleItem.id })}>Edit</button>
-                          <button className="btn btn-danger btn-xs" onClick={() => setConfirmTarget({ type: 'lessons', id: lesson.id })}>Delete</button>
+                          <button className="btn btn-ghost btn-xs" onClick={() => setModuleModal({ ...moduleItem, courseId: course.id })}>Edit</button>
+                          <button className="btn btn-danger btn-xs" onClick={() => setConfirmTarget({ type: 'modules', id: moduleItem.id })}>Delete</button>
+                          <button
+                            className={`collapse-btn ${collapsedModules[moduleItem.id] ? '' : 'open'}`}
+                            onClick={() => toggleModule(moduleItem.id)}
+                            title={collapsedModules[moduleItem.id] ? 'Expand module' : 'Collapse module'}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M4 6l4 4 4-4"/>
+                            </svg>
+                          </button>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                      {!collapsedModules[moduleItem.id] && (
+                        <div className="module-admin-body">
+                          <div className="module-admin-actions">
+                            <button className="btn btn-ghost btn-xs" onClick={() => setLessonModal({ moduleId: moduleItem.id })}>Add Lesson</button>
+                            <button className="btn btn-ghost btn-xs" onClick={() => openQuizModal(moduleItem)}>
+                              {moduleQuizzes[moduleItem.id] ? 'Edit Quiz' : 'Add Quiz'}
+                            </button>
+                            {moduleQuizzes[moduleItem.id] && <span className="quiz-badge">Quiz ready</span>}
+                          </div>
+                          <div className="lesson-admin-list">
+                            {moduleItem.lessons?.map((lesson) => (
+                              <div key={lesson.id} className="lesson-admin-card">
+                                <div>
+                                  <strong>{lesson.lesson_name}</strong>
+                                  <p>{lesson.content?.slice(0, 160) || 'No lesson content yet.'}</p>
+                                </div>
+                                <div className="instructor-actions">
+                                  <button className="btn btn-ghost btn-xs" onClick={() => setLessonModal({ ...lesson, moduleId: moduleItem.id })}>Edit</button>
+                                  <button className="btn btn-danger btn-xs" onClick={() => setConfirmTarget({ type: 'lessons', id: lesson.id })}>Delete</button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
         ))}
       </div>

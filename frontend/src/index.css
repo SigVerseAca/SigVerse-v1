@@ -1690,6 +1690,8 @@ select.form-input {
   padding: 2rem;
   width: 100%;
   max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: var(--shadow-lg);
   animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2724,6 +2726,57 @@ select.form-input {
   overflow: auto;
 }
 
+.approval-payload-pretty {
+  margin-top: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.payload-section-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 0.45rem 0.85rem;
+  background: rgba(15, 23, 42, 0.04);
+  border-bottom: 1px solid var(--border);
+  margin: 0;
+}
+
+.payload-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.45rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.payload-row:last-child {
+  border-bottom: none;
+}
+
+.payload-row:nth-child(even) {
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.payload-label {
+  flex-shrink: 0;
+  width: 130px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.payload-value {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  word-break: break-word;
+  flex: 1;
+}
 /* ============================================
    EMPTY STATES
    ============================================ */
@@ -2984,4 +3037,33 @@ select.form-input {
   border-radius: 16px;
   color: var(--color-muted);
   background: rgba(255, 255, 255, 0.6);
+}
+
+
+.collapse-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.collapse-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+
+.collapse-btn svg {
+  transition: transform 0.22s ease;
+  display: block;
+}
+
+.collapse-btn.open svg {
+  transform: rotate(180deg);
 }
