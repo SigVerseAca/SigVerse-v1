@@ -148,6 +148,8 @@ const ModuleService = require('./ModuleService');
 const LessonService = require('./LessonService');
 const EmailService = require('./EmailService');
 
+
+// ApprovalService handles the logic for managing approval requests for instructor signups and course/module/lesson changes, including creating requests, approving/rejecting them, and sending notification emails to users about the outcomes of their requests.
 class ApprovalService {
   static async listForUser(user) {
     if (user.role === 'admin') {
@@ -160,7 +162,7 @@ class ApprovalService {
   static normalizeCourseTitle(title = '') {
     return String(title).trim().replace(/\s+/g, ' ').toLowerCase();
   }
-
+  // This method checks if a course creation or update request is allowed based on existing courses and pending requests to prevent duplicates and conflicts. It throws a 409 error if a similar course already exists or if there is a pending request for the same course title.
   static async assertCourseRequestAllowed(data) {
     if (data.request_type !== 'course' || !data.requester_id) return;
 
@@ -221,12 +223,12 @@ class ApprovalService {
     err.status = 409;
     throw err;
   }
-
+  // This method creates a new approval request after validating that it is allowed (for course requests) and returns the created request document.
   static async createRequest(data) {
     await this.assertCourseRequestAllowed(data);
     return ApprovalRequest.create(data);
   }
-
+  // This method attempts to claim a pending approval request for review by setting a processing lock and reviewer information. If the request is already being processed or has been reviewed, it throws a 409 error. If the request does not exist, it throws a 404 error.
   static async claimPendingRequest(id, reviewerId) {
     const reviewTimestamp = new Date();
     const request = await ApprovalRequest.findOneAndUpdate(
@@ -258,7 +260,7 @@ class ApprovalService {
     err.status = 409;
     throw err;
   }
-
+  // This method releases the processing lock on a pending approval request, allowing it to be claimed again for review. It is typically called if an error occurs during the approval process to ensure the request can be reviewed by another admin.
   static async releasePendingRequestLock(id) {
     await ApprovalRequest.updateOne(
       { _id: id, status: 'pending' },
@@ -271,7 +273,7 @@ class ApprovalService {
       }
     );
   }
-
+  // This method handles the approval of an approval request by first claiming it for review, then performing the necessary actions based on the request type (e.g., activating an instructor account, creating/updating/deleting a course/module/lesson), and finally updating the request status to approved. It also sends notification emails to users about the outcome of their requests. If any error occurs during the process, it releases the processing lock on the request to allow other admins to review it.
   static async approve(id, reviewerId) {
     const request = await this.claimPendingRequest(id, reviewerId);
 
@@ -344,6 +346,7 @@ class ApprovalService {
       request.reviewed_at = new Date();
       await request.save();
 
+      // Send notification emails after successful approval
       if (instructorApprovalEmail) {
         const loginUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login`;
         await EmailService.sendEmail({
@@ -378,6 +381,7 @@ class ApprovalService {
         }).catch((emailErr) => console.error('[ApprovalService] Failed to send approval email:', emailErr.message));
       }
 
+      // Send course approval email if applicable
       if (courseApprovalEmail) {
         const instructorUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/instructor`;
         const actionLabel = {
@@ -423,7 +427,7 @@ class ApprovalService {
 
     return { request, result };
   }
-
+  // This method handles the rejection of an approval request by first claiming it for review, then updating the request status to rejected and adding any admin notes. If the request is for an instructor signup, it also disables the associated credential. Finally, it sends a notification email to the user about the rejection and any admin notes provided. If any error occurs during the process, it releases the processing lock on the request to allow other admins to review it.
   static async reject(id, reviewerId, note = '') {
     const request = await this.claimPendingRequest(id, reviewerId);
 
@@ -443,6 +447,7 @@ class ApprovalService {
 
           // Send rejection notification email
           const noteText = note ? `\n\nAdmin note: ${note}` : '';
+
           await EmailService.sendEmail({
             to: credential.email,
             subject: 'Sigverse — Instructor Application Update',
@@ -474,7 +479,7 @@ class ApprovalService {
 
     return request;
   }
-
+  // This helper method applies the changes specified in an approval request to the appropriate service (CourseService, ModuleService, or LessonService) based on the request type and action. It supports creating new resources, updating existing ones, and deleting resources as requested by the user. If the request action is not recognized, it throws a 400 error.
   static async applyResourceRequest(service, request) {
     if (request.action === 'create') {
       return service.create(request.payload);
