@@ -12,7 +12,7 @@ export function ToastProvider({ children }) {
     setToasts((current) => current.filter((toast) => toast.id !== id));
   };
 
-  const showToast = (message, tone = 'info', duration = 4000) => {
+  const showToast = (message, tone = 'info', duration = 6000) => {
     const id = `toast-${toastId += 1}`;
     setToasts((current) => [...current, { id, message, tone, duration }]);
   };
