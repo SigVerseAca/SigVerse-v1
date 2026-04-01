@@ -10,7 +10,7 @@ exports.create = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'name, email, and role are required' });
     }
     const data = await UserService.create({ name, email, role });
-    sendSuccess(res, 201, data, 'User created');
+    sendSuccess(res, 201, data, 'User created — login credentials emailed to ' + email);
   } catch (err) { next(err); }
 };
 
