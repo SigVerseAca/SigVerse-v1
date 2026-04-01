@@ -9,8 +9,6 @@ const CATEGORY_RULES = [
   { category: 'Product Analytics & Discovery', keywords: ['analytics', 'product', 'discovery', 'roadmapping', 'metrics', 'visualization', 'search'] },
   { category: 'DevOps, Cloud & Observability', keywords: ['cloud', 'observability', 'incident', 'release', 'operations'] },
   { category: 'Delivery, Leadership & Collaboration', keywords: ['leadership', 'agile', 'delivery', 'review', 'communication', 'collaborative'] },
-  { category: 'Developer Experience & Support', keywords: ['developer experience', 'support', 'knowledge base'] },
-  { category: 'AI & Automation', keywords: ['ai'] }
 ];
 
 const SAMPLE_VIDEOS = [
@@ -37,7 +35,7 @@ export function getCourseCategory(course) {
 export function getCourseCategories(courses) {
   const matchedCategories = (courses || []).map(getCourseCategory);
   const catalogCategories = CATEGORY_RULES.map((rule) => rule.category);
-  return ['All Categories', ...Array.from(new Set([...catalogCategories, ...matchedCategories, 'General']))];
+  return ['All Categories', ...Array.from(new Set([...catalogCategories, ...matchedCategories]))];
 }
 
 function extractYouTubeId(rawUrl) {

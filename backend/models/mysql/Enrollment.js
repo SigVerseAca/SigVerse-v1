@@ -41,10 +41,11 @@ class Enrollment {
   }
 
   static async create(data) {
-    const { user_id, course_id } = data;
+    const { user_id, course_id, status = 'active' } = data;
+    const now = new Date();
     const [result] = await pool.query(
-      'INSERT INTO enrollments (user_id, course_id) VALUES (?, ?)',
-      [user_id, course_id]
+      'INSERT INTO enrollments (user_id, course_id, status, enrolled_at) VALUES (?, ?, ?, ?)',
+      [user_id, course_id, status, now]
     );
     return this.findById(result.insertId);
   }

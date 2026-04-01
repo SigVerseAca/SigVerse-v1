@@ -319,14 +319,14 @@ export default function Login() {
   const isSignupFlow = ['signup', 'signup-otp'].includes(view);
   const panelCopy = {
     login: {
-      eyebrow: 'Return to your workspace',
+      eyebrow: '',
       title: 'Sign in and keep learning moving',
-      text: 'Access your learner, instructor, or admin workspace with local email login or GitHub OAuth.'
+      text: ''
     },
     signup: {
       eyebrow: 'Create your account',
       title: 'Start with a structured setup',
-      text: 'Create a learner account instantly or submit an instructor request for admin approval.'
+      text: ''
     },
     'signup-otp': {
       eyebrow: 'Verify your email',
@@ -365,14 +365,14 @@ export default function Login() {
             </div>
           </div>
           <div className="login-showcase-band">
-            {PLATFORM_SIGNALS.map((signal) => (
+            {/* {PLATFORM_SIGNALS.map((signal) => (
               <div key={signal.label} className="login-signal-chip">
                 <strong className="login-signal-value">{signal.value}</strong>
                 <span className="login-signal-label">{signal.label}</span>
               </div>
-            ))}
+            ))} */}
           </div>
-          <div className="login-trust-grid">
+          {/* <div className="login-trust-grid">
             <div className="login-trust-card">
               <strong>Role-aware access</strong>
               <span>Learners, instructors, and admins each land in workflows shaped for their actual tasks.</span>
@@ -385,7 +385,7 @@ export default function Login() {
               <strong>Instructor approval flow</strong>
               <span>Instructor accounts and course requests pass through admin review before publishing access expands.</span>
             </div>
-          </div>
+          </div> */}
         </section>
 
         <div className="login-card login-card-wide">
@@ -617,7 +617,7 @@ export default function Login() {
               {githubLoading ? 'Redirecting…' : 'Continue with GitHub'}
             </button>
 
-            <p className="login-footer-text">Use GitHub OAuth or your email and password to continue.</p>
+            {/* <p className="login-footer-text">Use GitHub OAuth or your email and password to continue.</p> */}
           </div>
         </div>
       </div>

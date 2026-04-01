@@ -2,7 +2,8 @@ const Joi = require('joi');
 
 exports.enrollmentCreateSchema = Joi.object({
   user_id: Joi.number().integer().required(),
-  course_id: Joi.number().integer().required()
+  course_id: Joi.number().integer().required(),
+  status: Joi.string().valid('active', 'completed').optional()
 });
 
 exports.enrollmentUpdateSchema = Joi.object({

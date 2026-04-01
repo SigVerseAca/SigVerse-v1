@@ -28,9 +28,10 @@ class User {
   // Create a new user
   static async create(data) {
     const { name, email, role = 'learner', github_id = null, avatar_url = null } = data;
+    const now = new Date();
     const [result] = await pool.query(
-      'INSERT INTO users (name, email, role, github_id, avatar_url) VALUES (?, ?, ?, ?, ?)',
-      [name, email, role, github_id, avatar_url]
+      'INSERT INTO users (name, email, role, github_id, avatar_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, email, role, github_id, avatar_url, now, now]
     );
     return this.findById(result.insertId);
   }

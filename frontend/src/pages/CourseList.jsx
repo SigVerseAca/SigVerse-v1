@@ -224,7 +224,8 @@ export default function CourseList() {
         )}
       </section>
       <section className="catalog-category-row">
-        {categories.map((category) => (
+        {
+        categories.map((category) => (
           <button
             key={category}
             type="button"

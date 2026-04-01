@@ -118,7 +118,7 @@ Page -> Hook/Component -> Service -> Axios API client -> Backend endpoint
 
 This split is designed for real ownership, minimal overlap, and easier code reviews.
 
-## 4.1 Team Member 1: Platform Engineering, App Composition, Environment, and Data Foundations
+## 4.1 Team Member 1: Platform Engineering, App Composition, Environment, and Data Foundations - Tanisha & Sidhartha
 
 ### Primary Scope
 
@@ -171,7 +171,7 @@ This member is not just the setup owner; they are the platform integrator. These
 
 ---
 
-## 4.2 Team Member 2: Authentication, Authorization, Session Flow, and Identity
+## 4.2 Team Member 2: Authentication, Authorization, Session Flow, and Identity - siya
 
 ### Primary Scope
 
@@ -224,7 +224,7 @@ This is a full identity slice: database credential storage, auth APIs, JWTs, fro
 
 ---
 
-## 4.3 Team Member 3: Course Catalog and Content Structure
+## 4.3 Team Member 3: Course Catalog and Content Structure - tanisha & Saurabh
 
 ### Primary Scope
 
@@ -279,7 +279,7 @@ This is the content model of the platform. It is a clean vertical slice from sto
 
 ---
 
-## 4.4 Team Member 4: Learner Journey, Enrollment, Progress, and Performance
+## 4.4 Team Member 4: Learner Journey, Enrollment, Progress, and Performance - brajesh & sidhartha
 
 ### Primary Scope
 
@@ -338,7 +338,7 @@ This is the core learner journey slice and directly maps to the main product out
 
 ---
 
-## 4.5 Team Member 5: Instructor Workflows, Quizzes, and Teaching Analytics
+## 4.5 Team Member 5: Instructor Workflows, Quizzes, and Teaching Analytics - shubham
 
 ### Primary Scope
 
@@ -377,7 +377,7 @@ Instructor workflows are complex enough to deserve their own owner, especially w
 
 ---
 
-## 4.6 Team Member 6: Admin Operations, User Management, and Approval Workflow
+## 4.6 Team Member 6: Admin Operations, User Management, and Approval Workflow - subhankar
 
 ### Primary Scope
 
@@ -419,7 +419,7 @@ The admin workflow is its own operational system, separate from pure content or 
 
 ---
 
-## 4.7 Team Member 7: Shared Frontend Experience, Design System, Navigation, and UX Consistency
+## 4.7 Team Member 7: Shared Frontend Experience, Design System, Navigation, and UX Consistency - 
 
 ### Primary Scope
 

@@ -72,9 +72,10 @@ class Course {
 
   static async create(data) {
     const { title, description, youtube_video_url = null, instructor_id } = data;
+    const now = new Date();
     const [result] = await pool.query(
-      'INSERT INTO courses (title, description, youtube_video_url, instructor_id) VALUES (?, ?, ?, ?)',
-      [title, description, youtube_video_url || null, instructor_id]
+      'INSERT INTO courses (title, description, youtube_video_url, instructor_id, created_at) VALUES (?, ?, ?, ?, ?)',
+      [title, description, youtube_video_url || null, instructor_id, now]
     );
     return this.findById(result.insertId);
   }

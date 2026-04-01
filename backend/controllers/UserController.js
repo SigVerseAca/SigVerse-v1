@@ -2,6 +2,18 @@ const UserService = require('../services/UserService');
 const { sendSuccess, sendError } = require('../utils/response');
 
 
+// Creates a new user with admin privileges
+exports.create = async (req, res, next) => {
+  try {
+    const { name, email, role } = req.body;
+    if (!name || !email || !role) {
+      return res.status(400).json({ success: false, message: 'name, email, and role are required' });
+    }
+    const data = await UserService.create({ name, email, role });
+    sendSuccess(res, 201, data, 'User created');
+  } catch (err) { next(err); }
+};
+
 // Retrieves all users, filtering out self from results
 exports.getAll = async (req, res, next) => {
   try {

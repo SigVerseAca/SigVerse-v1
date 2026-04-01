@@ -8,6 +8,7 @@ const { userUpdateSchema, userPatchSchema } = require('../utils/validators/userV
 
 
 // User routes for managing user accounts
+router.post('/', authenticate, authorize('admin'), logger, UserController.create);
 router.get('/', authenticate, authorize('admin', 'instructor'), logger, UserController.getAll);
 router.get('/:id', authenticate, logger, UserController.getById);
 router.put('/:id', authenticate, authorize('admin'), validate(userUpdateSchema), logger, UserController.update);
