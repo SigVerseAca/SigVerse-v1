@@ -1,5 +1,6 @@
 const Joi = require('joi');
 
+// Shared between create and patch so both endpoints enforce the same YouTube-only URL rules.
 const youtubeUrlSchema = Joi.string()
   .trim()
   .uri({ scheme: ['http', 'https'] })
@@ -17,6 +18,7 @@ exports.lessonCreateSchema = Joi.object({
   youtube_video_url: youtubeUrlSchema.optional()
 });
 
+// PATCH requests must send at least one field, but every field remains individually optional.
 exports.lessonPatchSchema = Joi.object({
   module_id: Joi.number().integer().optional(),
   lesson_name: Joi.string().min(2).optional(),
