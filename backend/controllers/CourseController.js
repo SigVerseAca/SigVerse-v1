@@ -5,6 +5,7 @@ const { sendSuccess, sendError } = require('../utils/response');
 
 exports.create = async (req, res, next) => {
   try {
+    // Instructors submit an approval request; admins can create directly.
     if (req.user.role === 'instructor') {
       const data = await ApprovalService.createRequest({
         requester_id: req.user.sub,
@@ -30,6 +31,7 @@ exports.getAll = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   try {
     const data = await CourseService.getById(req.params.id);
+    // Return a clear 404 instead of an empty success payload.
     if (!data) return sendError(res, 404, 'Course not found');
     sendSuccess(res, 200, data);
   } catch (err) { next(err); }
@@ -37,6 +39,7 @@ exports.getById = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
+    // Instructors can only request updates for courses they own.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertCourseOwnership(req.user.sub, Number(req.params.id));
       const data = await ApprovalService.createRequest({
@@ -56,6 +59,7 @@ exports.update = async (req, res, next) => {
 
 exports.patch = async (req, res, next) => {
   try {
+    // PATCH follows the same approval path for instructor-made changes.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertCourseOwnership(req.user.sub, Number(req.params.id));
       const data = await ApprovalService.createRequest({
@@ -75,6 +79,7 @@ exports.patch = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
+    // Instructors cannot hard-delete directly; deletion also goes through approval.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertCourseOwnership(req.user.sub, Number(req.params.id));
       const data = await ApprovalService.createRequest({
