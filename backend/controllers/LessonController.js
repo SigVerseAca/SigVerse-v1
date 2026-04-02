@@ -4,6 +4,7 @@ const { sendSuccess, sendError } = require('../utils/response');
 
 exports.create = async (req, res, next) => {
   try {
+    // Instructors are restricted to creating lessons within modules they own.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertModuleOwnership(req.user.sub, Number(req.body.module_id));
       const data = await LessonService.create(req.body);
@@ -25,6 +26,7 @@ exports.getAll = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   try {
     const data = await LessonService.getById(req.params.id);
+    // Keep missing-resource behavior explicit for clients.
     if (!data) return sendError(res, 404, 'Lesson not found');
     sendSuccess(res, 200, data);
   } catch (err) { next(err); }
@@ -32,6 +34,7 @@ exports.getById = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
+    // Ownership check prevents instructors from editing lessons outside scope.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertLessonOwnership(req.user.sub, Number(req.params.id));
       const data = await LessonService.update(req.params.id, req.body);
@@ -45,6 +48,7 @@ exports.update = async (req, res, next) => {
 
 exports.patch = async (req, res, next) => {
   try {
+    // Partial updates enforce the same ownership rule as full updates.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertLessonOwnership(req.user.sub, Number(req.params.id));
       const data = await LessonService.patch(req.params.id, req.body);
@@ -58,6 +62,7 @@ exports.patch = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
+    // Instructors may delete only lessons they are authorized to manage.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertLessonOwnership(req.user.sub, Number(req.params.id));
       await LessonService.remove(req.params.id);
