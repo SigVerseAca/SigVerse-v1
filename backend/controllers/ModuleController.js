@@ -4,6 +4,7 @@ const { sendSuccess, sendError } = require('../utils/response');
 
 exports.create = async (req, res, next) => {
   try {
+    // Instructors can create modules only under courses they own.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertCourseOwnership(req.user.sub, Number(req.body.course_id));
       const data = await ModuleService.create(req.body);
@@ -25,6 +26,7 @@ exports.getAll = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
   try {
     const data = await ModuleService.getById(req.params.id);
+    // Return 404 for unknown module IDs.
     if (!data) return sendError(res, 404, 'Module not found');
     sendSuccess(res, 200, data);
   } catch (err) { next(err); }
@@ -32,6 +34,7 @@ exports.getById = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
+    // Ownership guard ensures instructors only update their own modules.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertModuleOwnership(req.user.sub, Number(req.params.id));
       const data = await ModuleService.update(req.params.id, req.body);
@@ -45,6 +48,7 @@ exports.update = async (req, res, next) => {
 
 exports.patch = async (req, res, next) => {
   try {
+    // Partial updates keep the same authorization boundary as full updates.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertModuleOwnership(req.user.sub, Number(req.params.id));
       const data = await ModuleService.patch(req.params.id, req.body);
@@ -58,6 +62,7 @@ exports.patch = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
+    // Deletion is limited to modules within the instructor's scope.
     if (req.user.role === 'instructor') {
       await InstructorScopeService.assertModuleOwnership(req.user.sub, Number(req.params.id));
       await ModuleService.remove(req.params.id);
