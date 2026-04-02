@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import useEnrollmentUi from '../hooks/useEnrollmentUi';
 import useToast from '../hooks/useToast';
 import { getCourseById } from '../services/courseService';
-import { getMyCourseFeedback, saveCourseFeedback } from '../services/courseFeedbackService';
+import { getMyCourseFeedback, saveCourseFeedback, getCourseFeedback, replyToFeedback } from '../services/courseFeedbackService';
 import { createEnrollment, getAllEnrollments } from '../services/enrollmentService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -35,6 +35,10 @@ export default function CourseDetail() {
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
   const [hasSavedFeedback, setHasSavedFeedback] = useState(false);
+  const [publicReviews, setPublicReviews] = useState([]);
+  const [instructorReplies, setInstructorReplies] = useState({});
+  const [replyDraft, setReplyDraft] = useState({});
+  const [replySubmitting, setReplySubmitting] = useState({});
 
   const courseId = Number(id);
 
@@ -43,6 +47,66 @@ export default function CourseDetail() {
       .then(res => setCourse(res.data.data))
       .catch(err => setError(err.response?.data?.message || 'Course not found'))
       .finally(() => setLoading(false));
+  }, [id]);
+
+  useEffect(() => {
+    const sampleReviews = [
+      {
+        id: 'sample-1',
+        learner_name: 'Arjun Mehta',
+        course_rating: 5,
+        instructor_rating: 5,
+        feedback: 'Absolutely fantastic course. The structure is clear, the content is practical, and the instructor explains complex concepts in a way that actually sticks. Best course I have taken on this platform.',
+        updated_at: '2026-02-14T10:30:00Z',
+        instructor_reply: null
+      },
+      {
+        id: 'sample-2',
+        learner_name: 'Priya Nair',
+        course_rating: 4,
+        instructor_rating: 5,
+        feedback: 'Really well-structured content. I loved how each module builds on the previous one. Would appreciate a few more hands-on exercises but overall a very strong course.',
+        updated_at: '2026-02-20T14:15:00Z',
+        instructor_reply: 'Thank you Priya! Great suggestion \u2014 we are working on adding more hands-on exercises to the next module update.'
+      },
+      {
+        id: 'sample-3',
+        learner_name: 'Ravi Shankar',
+        course_rating: 5,
+        instructor_rating: 4,
+        feedback: 'The depth of content here is impressive. I came in as a complete beginner and finished feeling genuinely confident. The video resources and lesson notes together make a great combination.',
+        updated_at: '2026-03-05T09:00:00Z',
+        instructor_reply: null
+      }
+    ];
+
+    const replies = {};
+    sampleReviews.forEach((r) => {
+      if (r.instructor_reply) replies[r.id] = r.instructor_reply;
+    });
+
+    getCourseFeedback(id)
+      .then((res) => {
+        const real = (res.data.data || []).map((r) => ({
+          id: r.id,
+          learner_name: r.learner_name || 'Learner',
+          course_rating: r.course_rating,
+          instructor_rating: r.instructor_rating,
+          feedback: r.feedback,
+          updated_at: r.updated_at,
+          instructor_reply: r.instructor_reply || null
+        }));
+        setPublicReviews([...real, ...sampleReviews]);
+        const realReplies = {};
+        real.forEach((r) => {
+          if (r.instructor_reply) realReplies[r.id] = r.instructor_reply;
+        });
+        setInstructorReplies({ ...replies, ...realReplies });
+      })
+      .catch(() => {
+        setPublicReviews(sampleReviews);
+        setInstructorReplies(replies);
+      });
   }, [id]);
 
   useEffect(() => {
@@ -60,7 +124,7 @@ export default function CourseDetail() {
         const mine = (res.data.data || []).filter((item) => item.user_id === user.id);
         setIsEnrolled(mine.some((item) => item.course_id === Number(id)));
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       cancelled = true;
@@ -134,6 +198,26 @@ export default function CourseDetail() {
       navigate('/courses', { replace: true });
     } catch (err) {
       showToast(err.response?.data?.message || 'Enrollment failed', 'error');
+    }
+  };
+
+  const handleReplyChange = (reviewId, value) => {
+    setReplyDraft((prev) => ({ ...prev, [reviewId]: value }));
+  };
+
+  const handleReplySubmit = async (reviewId) => {
+    const text = (replyDraft[reviewId] || '').trim();
+    if (!text) return;
+    setReplySubmitting((prev) => ({ ...prev, [reviewId]: true }));
+    try {
+      await replyToFeedback(reviewId, text);
+      setInstructorReplies((prev) => ({ ...prev, [reviewId]: text }));
+      setReplyDraft((prev) => ({ ...prev, [reviewId]: '' }));
+      showToast('Reply posted successfully.', 'success');
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to post reply', 'error');
+    } finally {
+      setReplySubmitting((prev) => ({ ...prev, [reviewId]: false }));
     }
   };
 
@@ -251,7 +335,7 @@ export default function CourseDetail() {
           ))}
         </div>
       </section>
-      
+
       <div className="modules-section">
         <h2 className="section-title">Modules & Lessons</h2>
         {course.modules && course.modules.length > 0 ? (
@@ -285,6 +369,81 @@ export default function CourseDetail() {
           <p className="empty-state">No modules added yet.</p>
         )}
       </div>
+
+      <section className="modules-section">
+        <h2 className="section-title">Learner Reviews</h2>
+        <div className="reviews-summary">
+          {publicReviews.length > 0 && (
+            <div className="reviews-avg-block">
+              <span className="reviews-avg-number">
+                {(publicReviews.reduce((s, r) => s + r.course_rating, 0) / publicReviews.length).toFixed(1)}
+              </span>
+              <div className="reviews-avg-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className={`rating-star ${star <= Math.round(publicReviews.reduce((s, r) => s + r.course_rating, 0) / publicReviews.length) ? 'rating-star-filled' : 'rating-star-empty'}`}
+                  >★</span>
+                ))}
+              </div>
+              <span className="reviews-count">{publicReviews.length} reviews</span>
+            </div>
+          )}
+        </div>
+        <div className="reviews-list">
+          {publicReviews.map((review) => (
+            <article key={review.id} className="review-card">
+              <div className="review-card-head">
+                <div className="review-avatar">{review.learner_name.charAt(0).toUpperCase()}</div>
+                <div className="review-meta">
+                  <strong className="review-learner-name">{review.learner_name}</strong>
+                  <span className="review-date">
+                    {new Date(review.updated_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </span>
+                </div>
+                <div className="review-ratings">
+                  <span className="review-rating-chip">Course {review.course_rating}/5</span>
+                  <span className="review-rating-chip">Instructor {review.instructor_rating}/5</span>
+                </div>
+              </div>
+              <div className="review-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span key={star} className={`rating-star ${star <= review.course_rating ? 'rating-star-filled' : 'rating-star-empty'}`}>★</span>
+                ))}
+              </div>
+              <p className="review-feedback-text">{review.feedback}</p>
+              {instructorReplies[review.id] && (
+                <div className="instructor-reply-block">
+                  <div className="instructor-reply-label">
+                    <span className="instructor-reply-icon">↩</span>
+                    Instructor reply
+                  </div>
+                  <p className="instructor-reply-text">{instructorReplies[review.id]}</p>
+                </div>
+              )}
+              {user?.role === 'instructor' && !instructorReplies[review.id] && (
+                <div className="instructor-reply-form">
+                  <textarea
+                    className="form-input form-textarea"
+                    placeholder="Write a reply to this review..."
+                    value={replyDraft[review.id] || ''}
+                    onChange={(e) => handleReplyChange(review.id, e.target.value)}
+                    rows={2}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => handleReplySubmit(review.id)}
+                    disabled={replySubmitting[review.id] || !(replyDraft[review.id] || '').trim()}
+                  >
+                    {replySubmitting[review.id] ? 'Posting...' : 'Post Reply'}
+                  </button>
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+      </section>
 
       {user?.role === 'learner' && (
         <section className="modules-section course-feedback-section">

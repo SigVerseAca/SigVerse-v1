@@ -28,6 +28,7 @@ export default function CourseList() {
   const deferredSearch = useDeferredValue(searchValue.trim().toLowerCase());
   const categories = getCourseCategories(courses);
   const isLearner = user?.role === 'learner';
+  const isInstructor = user?.role === 'instructor';
 
   usePageTitle('Courses');
 
@@ -85,6 +86,10 @@ export default function CourseList() {
     return matchesSearch && matchesCategory;
   });
 
+  const instructorCourses = isInstructor
+    ? filteredCourses.filter((course) => course.instructor_id === user.id)
+    : [];
+
   const learnerEnrolledCourses = [...filteredCourses]
     .filter((course) => visibleEnrolledIds.includes(course.id))
     .sort((a, b) => a.title.localeCompare(b.title));
@@ -95,7 +100,9 @@ export default function CourseList() {
   const visibleGeneralCourses = isLearner && viewFilter !== 'enrolled' ? learnerGeneralCourses : [];
   const sortedVisibleCourses = isLearner
     ? [...visibleEnrolledCourses, ...visibleGeneralCourses]
-    : [...filteredCourses].sort((a, b) => a.title.localeCompare(b.title));
+    : isInstructor && viewFilter === 'my-courses'
+      ? [...instructorCourses].sort((a, b) => a.title.localeCompare(b.title))
+      : [...filteredCourses].sort((a, b) => a.title.localeCompare(b.title));
 
   const summary = {
     courses: sortedVisibleCourses.length,
@@ -210,6 +217,23 @@ export default function CourseList() {
               { key: 'all', label: 'All Courses' },
               { key: 'available', label: 'Open to Enroll' },
               { key: 'enrolled', label: 'Already Enrolled' }
+            ].map((filter) => (
+              <button
+                key={filter.key}
+                type="button"
+                className={`catalog-filter-btn ${viewFilter === filter.key ? 'active' : ''}`}
+                onClick={() => setViewFilter(filter.key)}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {isInstructor && (
+          <div className="catalog-filters">
+            {[
+              { key: 'all', label: 'All Courses' },
+              { key: 'my-courses', label: 'My Courses' }
             ].map((filter) => (
               <button
                 key={filter.key}

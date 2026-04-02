@@ -41,6 +41,20 @@ class CourseFeedbackService {
       feedback: data.feedback.trim()
     });
   }
+
+  static async getCourseFeedback(courseId) {
+    return CourseFeedbackRepository.findByCourseId(courseId);
+  }
+
+  static async addInstructorReply(instructorId, feedbackId, reply) {
+    const result = await CourseFeedbackRepository.addInstructorReply(feedbackId, instructorId, reply);
+    if (!result) {
+      const err = new Error('Feedback not found or you are not the instructor for this course');
+      err.status = 404;
+      throw err;
+    }
+    return result;
+  }
 }
 
 module.exports = CourseFeedbackService;

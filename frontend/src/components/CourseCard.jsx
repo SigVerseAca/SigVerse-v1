@@ -46,6 +46,19 @@ export default function CourseCard({ course, onEnroll, enrolled, showEnroll = fa
         <h3 className="course-card-title">{course.title}</h3>
         <p className="course-card-desc">{course.description || 'No description available'}</p>
         <div className="course-card-instructor">Led by {course.instructor_name || 'Instructor'}</div>
+        {course.avg_course_rating && (
+          <div className="course-card-rating">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <span
+                key={star}
+                className={`rating-star ${star <= Math.round(Number(course.avg_course_rating)) ? 'rating-star-filled' : 'rating-star-empty'}`}
+              >
+                ★
+              </span>
+            ))}
+            <span className="rating-value">{Number(course.avg_course_rating).toFixed(1)}</span>
+          </div>
+        )}
         <div className="course-card-metrics">
           <div className="course-card-metric">
             <span className="course-card-metric-value">{moduleCount}</span>

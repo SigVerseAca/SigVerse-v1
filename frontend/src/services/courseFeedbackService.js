@@ -5,3 +5,5 @@ export const getInstructorCourseFeedback = (courseId) => api.get('/course-feedba
   params: courseId ? { course_id: courseId } : undefined
 });
 export const saveCourseFeedback = (data) => api.post('/course-feedback', data);
+export const getCourseFeedback = (courseId) => api.get(`/course-feedback/course/${courseId}`);
+export const replyToFeedback = (feedbackId, reply) => api.post(`/course-feedback/${feedbackId}/reply`, { reply });

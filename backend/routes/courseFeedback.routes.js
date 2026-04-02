@@ -9,5 +9,7 @@ const { courseFeedbackUpsertSchema } = require('../utils/validators/courseFeedba
 router.post('/', authenticate, authorize('learner'), validate(courseFeedbackUpsertSchema), logger, CourseFeedbackController.upsert);
 router.get('/mine/:courseId', authenticate, authorize('learner'), logger, CourseFeedbackController.getMyCourseFeedback);
 router.get('/instructor', authenticate, authorize('instructor'), logger, CourseFeedbackController.getInstructorFeedback);
+router.get('/course/:courseId', authenticate, logger, CourseFeedbackController.getCourseFeedback);
+router.post('/:feedbackId/reply', authenticate, authorize('instructor'), logger, CourseFeedbackController.replyToFeedback);
 
 module.exports = router;

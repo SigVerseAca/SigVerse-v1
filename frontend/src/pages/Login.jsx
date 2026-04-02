@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import useToast from '../hooks/useToast';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -131,7 +131,7 @@ function PasswordField({
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { user, login } = useAuth();
   const { showToast } = useToast();
   const [view, setView] = useState('login');
   const [form, setForm] = useState(INITIAL_FORM);
@@ -145,6 +145,8 @@ export default function Login() {
   const [githubLoading, setGithubLoading] = useState(false);
 
   usePageTitle('Sign In');
+
+  if (user) return <Navigate to="/dashboard" replace />;
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));

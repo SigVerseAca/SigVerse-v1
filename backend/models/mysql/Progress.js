@@ -42,9 +42,10 @@ class Progress {
 
   static async create(data) {
     const { user_id, course_id, completion_percentage = 0 } = data;
+    const now = new Date();
     const [result] = await pool.query(
-      'INSERT INTO progress (user_id, course_id, completion_percentage) VALUES (?, ?, ?)',
-      [user_id, course_id, completion_percentage]
+      'INSERT INTO progress (user_id, course_id, completion_percentage, last_accessed) VALUES (?, ?, ?, ?)',
+      [user_id, course_id, completion_percentage, now]
     );
     return this.findById(result.insertId);
   }

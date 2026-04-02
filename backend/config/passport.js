@@ -26,7 +26,7 @@ passport.use(new GitHubStrategy({
       } else {
         // Create new user
         const [result] = await pool.query(
-          'INSERT INTO users (name, email, role, github_id, avatar_url) VALUES (?, ?, ?, ?, ?)',
+          'INSERT INTO users (name, email, role, github_id, avatar_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
           [name, email, 'learner', github_id, avatar_url]
         );
         const [newUser] = await pool.query('SELECT * FROM users WHERE id = ?', [result.insertId]);

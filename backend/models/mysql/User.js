@@ -9,7 +9,7 @@ class User {
 
   // Find user by ID
   static async findById(id) {
-    const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT id, name, email, role, avatar_url, created_at, updated_at FROM users WHERE id = ?', [id]);
     return rows[0] || null;
   }
 
