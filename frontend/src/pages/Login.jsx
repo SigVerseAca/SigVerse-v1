@@ -24,7 +24,8 @@ const INITIAL_FORM = {
 const INITIAL_RESET = {
   email: '',
   otp: '',
-  newPassword: ''
+  newPassword: '',
+  confirmNewPassword: ''
 };
 
 const PLATFORM_SIGNALS = [
@@ -158,7 +159,7 @@ export default function Login() {
 
   const getAuthErrorMessage = (err) => {
     if (err.response?.status === 404) {
-      return 'Login and signup routes are not available on the running backend yet. Restart the backend server and try again.';
+      return 'Email not found. Please check your email address or sign up for a new account.';
     }
 
     if (!err.response) {
@@ -294,6 +295,12 @@ export default function Login() {
 
   const handleResetPassword = async (event) => {
     event.preventDefault();
+
+    if (resetForm.newPassword !== resetForm.confirmNewPassword) {
+      showToast('Passwords do not match', 'error');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -485,7 +492,7 @@ export default function Login() {
                     type="button"
                     className="login-helper-link"
                     onClick={() => {
-                      setResetForm({ email: form.email || '', otp: '', newPassword: '' });
+                      setResetForm({ email: form.email || '', otp: '', newPassword: '', confirmNewPassword: '' });
                       switchView('forgot');
                     }}
                   >
@@ -596,6 +603,14 @@ export default function Login() {
                   hint="Minimum 6 characters"
                   autoComplete="new-password"
                   showStrength
+                />
+                <PasswordField
+                  label="Confirm Password"
+                  value={resetForm.confirmNewPassword}
+                  onChange={(event) => updateResetField('confirmNewPassword', event.target.value)}
+                  show={showConfirmPassword}
+                  onToggle={() => setShowConfirmPassword((current) => !current)}
+                  autoComplete="new-password"
                 />
                 <button type="submit" className="btn btn-primary login-submit-btn" disabled={loading}>
                   {loading ? 'Updating...' : 'Reset Password'}

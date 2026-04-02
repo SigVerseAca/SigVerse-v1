@@ -51,7 +51,7 @@ export default function Profile() {
           </div>
           <div className="form-group">
             <label className="form-label">Email</label>
-            <input type="email" className="form-input" value={email} onChange={e => setEmail(e.target.value)} required disabled={isAdminSelfLocked} />
+            <input type="email" className="form-input" value={email} onChange={e => setEmail(e.target.value) } required disabled={isAdminSelfLocked}/>
           </div>
           <div className="form-group">
             <label className="form-label">Role</label>
