@@ -1,4 +1,4 @@
-# EduVerse
+# SigVerse
 
 Full-stack course enrollment and learning progress platform with:
 
